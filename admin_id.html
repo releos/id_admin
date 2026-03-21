@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin ID — La Intersección</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:     #0f172a;
+  --card:   #1e293b;
+  --card2:  #162032;
+  --border: #334155;
+  --border2:#475569;
+  --text:   #f1f5f9;
+  --muted:  #94a3b8;
+  --dim:    #64748b;
+  --acc:    #6366f1;
+  --acc2:   #4f46e5;
+  --acc3:   #4338ca;
+  --green:  #059669;
+  --green2: #047857;
+  --red:    #dc2626;
+  --amber:  #d97706;
+  --mono:   'Courier New', monospace;
+}
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh; padding: 1.5rem 1rem 3rem;
+}
+.wrap { max-width: 560px; margin: 0 auto; }
+
+/* ── Typography ── */
+h1 { font-size: 1.6rem; font-weight: 800; color: #fff; }
+h2 { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: .75rem; }
+h3 { font-size: .85rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: .4rem; }
+p  { color: var(--muted); font-size: .875rem; line-height: 1.6; }
+
+/* ── Cards ── */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; }
+.card-inner { background: var(--card2); border: 1px solid var(--border); border-radius: .625rem; padding: .875rem 1rem; }
+
+/* ── Steps ── */
+.step { display: none; }
+.step.active { display: block; animation: fadeIn .25s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── Mode buttons ── */
+.mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.mode-btn {
+  background: var(--card2); border: 2px solid var(--border); border-radius: .875rem;
+  padding: 1rem; cursor: pointer; transition: all .18s; text-align: left;
+  display: flex; flex-direction: column; gap: .4rem;
+}
+.mode-btn:hover { border-color: var(--acc); background: #1a2744; }
+.mode-btn .icon { font-size: 1.6rem; }
+.mode-btn .title { font-weight: 700; color: #fff; font-size: .875rem; }
+.mode-btn .desc  { color: var(--dim); font-size: .72rem; line-height: 1.4; }
+
+/* ── Inputs ── */
+.field { margin-bottom: 1rem; }
+label, .lbl {
+  display: block; font-size: .72rem; font-weight: 600;
+  color: var(--acc); text-transform: uppercase; letter-spacing: .07em; margin-bottom: .35rem;
+}
+label span, .lbl span { color: var(--dim); font-weight: 400; text-transform: none; letter-spacing: 0; }
+input[type="text"], input[type="date"], textarea, select {
+  width: 100%; background: var(--bg); border: 1px solid var(--border2);
+  border-radius: .5rem; padding: .7rem .9rem; color: var(--text);
+  font-size: .9rem; font-family: inherit; outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+input[type="text"]:focus, input[type="date"]:focus, textarea:focus, select:focus {
+  border-color: var(--acc); box-shadow: 0 0 0 3px rgba(99,102,241,.18);
+}
+textarea { resize: vertical; min-height: 72px; font-family: var(--mono); font-size: .8rem; }
+.hint { font-size: .72rem; color: var(--dim); margin-top: .3rem; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.input-with-btn { display: flex; gap: .5rem; }
+.input-with-btn input { flex: 1; }
+
+/* ── Toggle ── */
+.toggle-row { display: flex; align-items: center; gap: .6rem; margin-top: .3rem; cursor: pointer; }
+.toggle-row input[type="checkbox"] { width: 1rem; height: 1rem; accent-color: var(--acc); cursor: pointer; }
+.toggle-row span { font-size: .75rem; color: var(--dim); }
+
+/* ── Buttons ── */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+  padding: .7rem 1.1rem; border-radius: .5rem; font-size: .875rem;
+  font-weight: 700; cursor: pointer; border: none; transition: all .18s; }
+.btn:active { transform: scale(.97); }
+.btn-block { display: flex; width: 100%; }
+.btn-primary  { background: var(--acc2);  color: #fff; }
+.btn-primary:hover  { background: var(--acc3); }
+.btn-success  { background: var(--green); color: #fff; }
+.btn-success:hover  { background: var(--green2); }
+.btn-ghost    { background: var(--card2); color: var(--muted); border: 1px solid var(--border); }
+.btn-ghost:hover    { background: #273448; color: var(--text); }
+.btn-danger   { background: rgba(220,38,38,.15); color: #fca5a5; border: 1px solid rgba(220,38,38,.3); }
+.btn-danger:hover   { background: rgba(220,38,38,.25); }
+.btn-amber    { background: rgba(217,119,6,.15); color: #fcd34d; border: 1px solid rgba(217,119,6,.3); }
+.btn-amber:hover    { background: rgba(217,119,6,.25); }
+.btn-sm { padding: .45rem .75rem; font-size: .78rem; }
+
+/* ── Badges / alerts ── */
+.badge { display: inline-block; padding: .2rem .55rem; border-radius: .375rem; font-size: .7rem; font-weight: 700; }
+.badge-v0  { background: rgba(220,38,38,.15);  color: #fca5a5; border: 1px solid rgba(220,38,38,.3); }
+.badge-v1  { background: rgba(217,119,6,.15);  color: #fcd34d; border: 1px solid rgba(217,119,6,.3); }
+.badge-v2  { background: rgba(5,150,105,.15);  color: #6ee7b7; border: 1px solid rgba(5,150,105,.3); }
+.badge-uk  { background: rgba(99,102,241,.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,.3); }
+
+.alert { border-radius: .625rem; padding: .875rem 1rem; font-size: .85rem; line-height: 1.5; margin-bottom: 1rem; }
+.alert strong { display: block; font-weight: 700; margin-bottom: .15rem; }
+.alert-info    { background: rgba(99,102,241,.12); border: 1px solid rgba(99,102,241,.3); color: #a5b4fc; }
+.alert-warn    { background: rgba(217,119,6,.12);  border: 1px solid rgba(217,119,6,.3);  color: #fcd34d; }
+.alert-success { background: rgba(5,150,105,.12);  border: 1px solid rgba(5,150,105,.3);  color: #6ee7b7; }
+.alert-error   { background: rgba(220,38,38,.12);  border: 1px solid rgba(220,38,38,.3);  color: #fca5a5; }
+
+.err-msg { color: #f87171; font-size: .8rem; margin-top: .4rem; display: none; }
+.err-msg.show { display: block; }
+
+/* ── Mono display ── */
+.mono-val {
+  font-family: var(--mono); font-size: .82rem; color: #818cf8;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: .5rem; padding: .6rem .8rem; word-break: break-all;
+}
+.mono-val.large { font-size: 1.05rem; color: #a5b4fc; letter-spacing: .05em; }
+.mono-val.dim   { color: var(--dim); font-size: .72rem; }
+
+/* ── Copy row ── */
+.copy-row { display: flex; align-items: stretch; gap: .4rem; }
+.copy-row .mono-val { flex: 1; }
+.copy-btn { flex-shrink: 0; background: var(--card2); border: 1px solid var(--border);
+  border-radius: .5rem; padding: 0 .75rem; cursor: pointer; color: var(--dim);
+  font-size: .8rem; transition: all .18s; display: flex; align-items: center; }
+.copy-btn:hover { background: #273448; color: var(--text); border-color: var(--acc); }
+.copy-btn.copied { color: #6ee7b7; border-color: rgba(5,150,105,.5); }
+
+/* ── Divider ── */
+hr { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+.or-divider { display: flex; align-items: center; gap: .75rem; margin: 1rem 0; color: var(--dim); font-size: .75rem; }
+.or-divider::before, .or-divider::after { content:''; flex:1; height:1px; background: var(--border); }
+
+/* ── Breakdown table ── */
+.breakdown-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.breakdown-table th { text-align: left; padding: .5rem .75rem; color: var(--dim); font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--border); }
+.breakdown-table td { padding: .55rem .75rem; border-bottom: 1px solid rgba(51,65,85,.5); vertical-align: middle; }
+.breakdown-table tr:last-child td { border-bottom: none; }
+.breakdown-table .k { color: var(--dim); font-size: .75rem; }
+.breakdown-table .v { font-family: var(--mono); color: #a5b4fc; word-break: break-all; }
+.breakdown-table .v.norm { font-family: inherit; color: var(--text); }
+
+/* ── Preview pill ── */
+.preview-pill {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: rgba(99,102,241,.12); border: 1px solid rgba(99,102,241,.3);
+  border-radius: 2rem; padding: .35rem .9rem; font-size: .85rem;
+}
+.preview-pill .pub { font-family: var(--mono); color: #a5b4fc; font-weight: 700; font-size: 1rem; }
+.preview-pill .sub { color: var(--dim); font-size: .7rem; }
+
+/* ── Misc ── */
+details > summary { cursor: pointer; list-style: none; user-select: none; }
+details > summary::-webkit-details-marker { display: none; }
+.flex { display: flex; } .gap2 { gap: .5rem; } .gap3 { gap: .75rem; }
+.items-center { align-items: center; } .flex-1 { flex: 1; }
+.mt1 { margin-top: .25rem; } .mt2 { margin-top: .5rem; } .mt3 { margin-top: .75rem; } .mt4 { margin-top: 1rem; }
+.mb1 { margin-bottom: .25rem; } .mb2 { margin-bottom: .5rem; } .mb3 { margin-bottom: .75rem; } .mb4 { margin-bottom: 1rem; }
+.text-center { text-align: center; }
+.hidden { display: none !important; }
+.w-full { width: 100%; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="text-center mb4" style="padding-top:.5rem">
+    <div style="font-size:2rem;margin-bottom:.25rem">🛠️</div>
+    <h1>Gestión de ID <span style="color:var(--dim);font-weight:400;font-size:1rem">Admin</span></h1>
+    <p style="font-size:.8rem;margin-top:.25rem">La Intersección — herramienta local · todo ocurre en tu navegador</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- PASO 0 — Elegir modo                                          -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="step active" id="s-mode">
+    <div class="card">
+      <h2>¿Qué quieres hacer?</h2>
+      <div class="mode-grid">
+
+        <button class="mode-btn" onclick="setMode('migrate')">
+          <div class="icon">🔄</div>
+          <div class="title">Migrar</div>
+          <div class="desc">Convierte un ID antiguo (v0/v1) al nuevo formato v2.</div>
+        </button>
+
+        <button class="mode-btn" onclick="setMode('edit')">
+          <div class="icon">✏️</div>
+          <div class="title">Editar</div>
+          <div class="desc">Modifica cualquier campo de un ID existente (cualquier versión).</div>
+        </button>
+
+        <button class="mode-btn" onclick="setMode('new')">
+          <div class="icon">✨</div>
+          <div class="title">Crear nuevo</div>
+          <div class="desc">Genera un ID v2 nuevo desde cero.</div>
+        </button>
+
+        <button class="mode-btn" onclick="setMode('analyze')">
+          <div class="icon">🔬</div>
+          <div class="title">Analizar</div>
+          <div class="desc">Descompón cualquier ID en sus partes sin modificarlo.</div>
+        </button>
+
+      </div>
+    </div>
+
+    <div class="alert alert-info" style="font-size:.78rem">
+      <strong>Formatos soportados</strong>
+      <span class="badge badge-v0">v0</span> UUID clásico &nbsp;
+      <span class="badge badge-v1">v1</span> UUID + timestamp &nbsp;
+      <span class="badge badge-v2">v2</span> usuario~nombre~fecha~random
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- PASO 1 — Cargar ID                                            -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="step" id="s-load">
+    <div class="card">
+      <button class="btn btn-ghost btn-sm mb3" onclick="goTo('s-mode')">← Volver</button>
+      <h2 id="load-title"></h2>
+      <p id="load-desc" class="mb3"></p>
+
+      <div class="field">
+        <label>ID privado <span>(pega el texto directamente)</span></label>
+        <textarea id="load-raw" placeholder="Pega aquí el ID privado completo..."></textarea>
+      </div>
+
+      <div class="or-divider">o</div>
+
+      <label class="btn btn-ghost btn-block mb1" style="cursor:pointer;justify-content:center;">
+        📂 Subir archivo de ID (.html)
+        <input type="file" id="load-file" accept=".html" class="hidden">
+      </label>
+      <p id="load-file-ok" class="hint hidden text-center" style="color:#6ee7b7"></p>
+
+      <p id="load-err" class="err-msg"></p>
+      <button class="btn btn-primary btn-block mt3 w-full" onclick="loadId()">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- PASO 2 — Formulario de edición / creación                     -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="step" id="s-form">
+    <div class="card">
+      <button class="btn btn-ghost btn-sm mb3" id="form-back-btn">← Volver</button>
+      <h2 id="form-title"></h2>
+
+      <!-- ID actual detectado -->
+      <div id="form-detected" class="hidden mb3">
+        <div class="flex gap2 items-center mb1">
+          <h3 style="margin:0">ID detectado</h3>
+          <span id="form-detected-badge" class="badge"></span>
+        </div>
+        <div class="mono-val dim mb1" id="form-detected-id"></div>
+        <p id="form-detected-meta" style="font-size:.75rem;color:var(--dim)"></p>
+      </div>
+
+      <!-- Aviso cambio de ID público -->
+      <div id="form-warn-pubchange" class="alert alert-warn hidden mb3">
+        <strong>⚠️ El ID público cambiará</strong>
+        Si este usuario tiene puntos en el podio, deberás actualizar su entrada en la hoja de cálculo manualmente.
+      </div>
+
+      <hr>
+
+      <!-- Vista previa del ID público -->
+      <div class="mb3 text-center">
+        <p class="hint mb1">Vista previa del ID público</p>
+        <div class="preview-pill" id="preview-wrap">
+          <span class="pub" id="preview-pub">—</span>
+          <span class="sub">ID público</span>
+        </div>
+      </div>
+
+      <!-- Nombre de usuario -->
+      <div class="field">
+        <label>Nombre de usuario <span>(aparece en el podio)</span></label>
+        <input type="text" id="f-user" maxlength="12" placeholder="ej: nekro99" autocomplete="off" spellcheck="false">
+        <p class="hint">3–12 caracteres. Solo letras, números y guion bajo.</p>
+        <label class="toggle-row mt1">
+          <input type="checkbox" id="f-user-unlock">
+          <span>Desbloquear límite de 12 caracteres (solo admin)</span>
+        </label>
+      </div>
+
+      <!-- Nombre de display -->
+      <div class="field">
+        <label>Nombre de display <span>(como se llama el jugador)</span></label>
+        <input type="text" id="f-disp" maxlength="20" placeholder="ej: El Detective Oscuro">
+        <p class="hint">Máx. 20 caracteres (o más con el desbloqueo).</p>
+        <label class="toggle-row mt1">
+          <input type="checkbox" id="f-disp-unlock">
+          <span>Desbloquear límite de 20 caracteres (solo admin)</span>
+        </label>
+      </div>
+
+      <!-- Fecha de alta + parte aleatoria -->
+      <div class="row2">
+        <div class="field">
+          <label>Fecha de alta</label>
+          <input type="date" id="f-date">
+          <p class="hint">Vacío = hoy.</p>
+        </div>
+        <div class="field">
+          <label>Parte aleatoria <span>(8 chars base36)</span></label>
+          <div class="input-with-btn">
+            <input type="text" id="f-rand" maxlength="16" placeholder="automático" autocomplete="off" spellcheck="false"
+              style="font-family:var(--mono);font-size:.85rem">
+            <button class="btn btn-ghost btn-sm" onclick="regenRand()" title="Regenerar">🔀</button>
+          </div>
+          <p class="hint">Deja vacío para generar automáticamente.</p>
+        </div>
+      </div>
+
+      <!-- URL de redirección -->
+      <div class="field">
+        <label>URL de redirección <span>(enlace al juego)</span></label>
+        <input type="text" id="f-url" placeholder="https://tu-sitio.com/index.html">
+        <p class="hint">La URL que incluirá el archivo de ID descargable.</p>
+      </div>
+
+      <p id="form-err" class="err-msg"></p>
+
+      <div class="flex gap2 mt3">
+        <button class="btn btn-primary flex-1" onclick="buildId()">Generar ID →</button>
+        <button class="btn btn-ghost" onclick="clearForm()" title="Limpiar formulario">🗑</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- PASO 3 — Analizar (solo lectura)                              -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="step" id="s-analyze">
+    <div class="card">
+      <button class="btn btn-ghost btn-sm mb3" onclick="goTo('s-load')">← Volver</button>
+      <div class="flex gap2 items-center mb3">
+        <h2 style="margin:0">🔬 Análisis del ID</h2>
+        <span id="an-badge" class="badge"></span>
+      </div>
+
+      <div id="an-content"></div>
+
+      <hr>
+      <h3>Desglose para hoja de cálculo</h3>
+      <div class="card-inner mb2">
+        <table class="breakdown-table" id="an-table"></table>
+      </div>
+      <div class="flex gap2">
+        <button class="btn btn-ghost btn-sm flex-1" onclick="copyTSV('an-table', false)">📋 Copiar valores (TSV)</button>
+        <button class="btn btn-ghost btn-sm flex-1" onclick="copyTSV('an-table', true)">📋 Con cabeceras</button>
+      </div>
+
+      <hr>
+      <button class="btn btn-amber btn-block w-full mt2" onclick="editFromAnalysis()">✏️ Editar este ID</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- PASO 4 — Resultado                                            -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="step" id="s-result">
+    <div class="card">
+      <div class="text-center mb3">
+        <div style="font-size:2.5rem;margin-bottom:.25rem">✅</div>
+        <h2 style="margin:0">ID listo</h2>
+        <p id="res-label" style="font-size:.8rem;margin-top:.15rem"></p>
+      </div>
+
+      <!-- ID público -->
+      <div class="field">
+        <h3>ID público (podio)</h3>
+        <div class="copy-row">
+          <div class="mono-val large" id="res-pub"></div>
+          <button class="copy-btn" onclick="copyField('res-pub',this)" title="Copiar">📋</button>
+        </div>
+      </div>
+
+      <!-- Nombre display -->
+      <div class="field">
+        <h3>Nombre de display</h3>
+        <div class="copy-row">
+          <div class="mono-val" id="res-disp" style="color:var(--text);font-family:inherit"></div>
+          <button class="copy-btn" onclick="copyField('res-disp',this)" title="Copiar">📋</button>
+        </div>
+      </div>
+
+      <!-- Fecha -->
+      <div class="field">
+        <h3>Fecha de alta</h3>
+        <div class="mono-val" id="res-date" style="color:var(--muted)"></div>
+      </div>
+
+      <!-- ID privado -->
+      <details class="mb3">
+        <summary class="card-inner" style="padding:.65rem 1rem;font-size:.75rem;color:var(--dim)">
+          🔒 Ver ID privado completo
+        </summary>
+        <div class="card-inner" style="margin-top:.25rem">
+          <div class="copy-row">
+            <div class="mono-val dim" id="res-priv"></div>
+            <button class="copy-btn" onclick="copyField('res-priv',this)" title="Copiar">📋</button>
+          </div>
+        </div>
+      </details>
+
+      <hr>
+
+      <!-- Desglose para Sheets -->
+      <details id="res-breakdown-wrap">
+        <summary style="cursor:pointer;user-select:none;margin-bottom:.75rem">
+          <span class="btn btn-ghost btn-sm" style="display:inline-flex">📊 Desglose para hoja de cálculo</span>
+        </summary>
+        <div class="card-inner mb2">
+          <table class="breakdown-table" id="res-table"></table>
+        </div>
+        <div class="flex gap2 mb2">
+          <button class="btn btn-ghost btn-sm flex-1" onclick="copyTSV('res-table', false)">📋 Copiar valores (TSV)</button>
+          <button class="btn btn-ghost btn-sm flex-1" onclick="copyTSV('res-table', true)">📋 Con cabeceras</button>
+        </div>
+      </details>
+
+      <hr>
+
+      <!-- URL de descarga -->
+      <div class="field">
+        <h3>URL de redirección en el archivo</h3>
+        <div class="input-with-btn">
+          <input type="text" id="res-url" placeholder="https://tu-sitio.com/index.html">
+          <button class="btn btn-ghost btn-sm" onclick="detectUrlFromForm()">↩ Restaurar</button>
+        </div>
+        <p class="hint">Puedes cambiarla antes de descargar.</p>
+      </div>
+
+      <div class="flex gap2 mt3" style="flex-wrap:wrap">
+        <button class="btn btn-success flex-1" onclick="doDownload()">⬇️ Descargar archivo ID</button>
+        <button class="btn btn-ghost" onclick="goTo('s-mode')" title="Volver al inicio">🏠</button>
+        <button class="btn btn-ghost" onclick="goTo('s-form')" title="Seguir editando">✏️</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// ESTADO
+// ═══════════════════════════════════════════════════════════════════
+let mode      = '';      // 'migrate' | 'edit' | 'new' | 'analyze'
+let sourceId  = '';      // ID cargado (crudo)
+let sourceUrl = '';      // URL extraída del archivo
+let builtId   = '';      // ID generado en el formulario
+let analyzingId = '';    // ID en modo análisis
+
+// ═══════════════════════════════════════════════════════════════════
+// HELPERS DE FORMATO
+// ═══════════════════════════════════════════════════════════════════
+
+function encName(n) {
+  try { return btoa(unescape(encodeURIComponent(n))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,''); }
+  catch(e) { return btoa(n).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,''); }
+}
+function decName(e) {
+  if (!e) return '';
+  try { return decodeURIComponent(escape(atob(e.replace(/-/g,'+').replace(/_/g,'/')))); }
+  catch(err) { return e; }
+}
+function rnd36(len) {
+  const ch='0123456789abcdefghijklmnopqrstuvwxyz', a=new Uint8Array(len);
+  crypto.getRandomValues(a);
+  return Array.from(a, b=>ch[b%36]).join('');
+}
+
+// Detectar versión
+function detectVersion(id) {
+  if (!id) return 'unknown';
+  if (id.includes('~') && id.split('~').length === 4) return 'v2';
+  if (/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}-/.test(id)) return 'v1';
+  if (/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(id)) return 'v0';
+  return 'unknown';
+}
+function isLegacy(id) { return ['v0','v1'].includes(detectVersion(id)); }
+function isV2(id)     { return detectVersion(id) === 'v2'; }
+
+// ID público
+function pubId(id) {
+  if (!id) return '—';
+  const v = detectVersion(id);
+  if (v === 'v2') { const p=id.split('~'); return `${p[0]}#${p[3].slice(0,4)}`; }
+  if (v === 'v1') { const p=id.split('-'); return p[5]; }
+  if (v === 'v0') return id; // UUID puro → es su propio ID público
+  return id.slice(0,16)+'…';
+}
+
+// Extraer fecha
+function dateFromV2(id) {
+  try {
+    const n = parseInt(id.split('~')[2], 36);
+    const y = Math.floor(n/10000), m = Math.floor((n%10000)/100)-1, d = n%100;
+    const dt = new Date(y, m, d);
+    return isNaN(dt.getTime()) ? null : dt;
+  } catch(e) { return null; }
+}
+function dateFromV1(id) {
+  const p = id.split('-'); if (p.length !== 6) return null;
+  const digits = p[5].split('').filter((_,i)=>i%2===0).join('');
+  const ts = parseInt(digits, 10);
+  return isNaN(ts) ? null : new Date(ts);
+}
+function dateFromId(id) {
+  const v = detectVersion(id);
+  if (v==='v2') return dateFromV2(id);
+  if (v==='v1') return dateFromV1(id);
+  return null;
+}
+
+// Construir ID v2
+function makeId(user, disp, date, rand) {
+  const u   = user.toLowerCase().trim();
+  const enc = encName(disp.trim());
+  const d   = date instanceof Date && !isNaN(date) ? date : new Date();
+  const n   = d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate();
+  const r   = (rand && /^[0-9a-z]{1,16}$/.test(rand)) ? rand.slice(0,8).padEnd(8,'0') : rnd36(8);
+  return `${u}~${enc}~${n.toString(36)}~${r}`;
+}
+
+// Formatear fecha
+function fmtDate(d) {
+  if (!d || isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'});
+}
+function fmtDateISO(d) {
+  if (!d || isNaN(d.getTime())) return '';
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${dd}`;
+}
+function parseInputDate(str) {
+  if (!str) return null;
+  const [y,m,d] = str.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+
+// Labels de versión
+function versionLabel(v) {
+  const map = { v0:'UUID clásico (v0)', v1:'UUID + timestamp (v1)', v2:'Nuevo formato (v2)', unknown:'Desconocido' };
+  return map[v] || v;
+}
+function versionBadgeClass(v) {
+  const map = { v0:'badge-v0', v1:'badge-v1', v2:'badge-v2' };
+  return map[v] || 'badge-uk';
+}
+
+// Extraer URL del HTML de un archivo de ID
+function extractUrl(html) {
+  let m = html.match(/const targetUrl\s*=\s*["']([^"'?#]+)/);
+  if (m) return m[1];
+  m = html.match(/href="([^"?#]+)\?restore_id=/);
+  if (m) return m[1];
+  return '';
+}
+function extractIdFromHtml(html) {
+  const mN = html.match(/restore_id=([A-Za-z0-9~_\-]{10,300})/);
+  if (mN) { try { return decodeURIComponent(mN[1]); } catch(e) { return mN[1]; } }
+  const mO = html.match(/localStorage\.setItem\('mystery_game_userid',\s*'([a-f0-9\-]+)'\)/);
+  if (mO) return mO[1];
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// NAVEGACIÓN
+// ═══════════════════════════════════════════════════════════════════
+function goTo(id) {
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.toggle('show', !!msg);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MODO
+// ═══════════════════════════════════════════════════════════════════
+function setMode(m) {
+  mode = m;
+  sourceId = ''; sourceUrl = '';
+  document.getElementById('load-file-ok').classList.add('hidden');
+  showErr('load-err','');
+  document.getElementById('load-raw').value = '';
+
+  if (m === 'new') {
+    prepareForm(); goTo('s-form');
+  } else if (m === 'analyze') {
+    document.getElementById('load-title').textContent = '🔬 Analizar ID';
+    document.getElementById('load-desc').textContent  = 'Pega el ID privado o sube el archivo. No se modificará nada.';
+    goTo('s-load');
+  } else if (m === 'migrate') {
+    document.getElementById('load-title').textContent = '🔄 Migrar ID antiguo';
+    document.getElementById('load-desc').textContent  = 'Pega o sube un ID de versión v0 o v1 para convertirlo al nuevo formato v2.';
+    goTo('s-load');
+  } else if (m === 'edit') {
+    document.getElementById('load-title').textContent = '✏️ Editar ID';
+    document.getElementById('load-desc').textContent  = 'Pega o sube cualquier ID (cualquier versión) para editar sus campos.';
+    goTo('s-load');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CARGAR ID
+// ═══════════════════════════════════════════════════════════════════
+document.getElementById('load-file').addEventListener('change', e => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const html  = ev.target.result;
+    const found = extractIdFromHtml(html);
+    const url   = extractUrl(html);
+    if (found) {
+      document.getElementById('load-raw').value = found;
+      sourceUrl = url;
+      const ok = document.getElementById('load-file-ok');
+      ok.textContent = `✔ ID encontrado en "${file.name}"` + (url ? ` · URL: ${url}` : '');
+      ok.classList.remove('hidden');
+      showErr('load-err','');
+    } else {
+      showErr('load-err', 'No se encontró un ID válido en ese archivo. ¿Es el archivo correcto?');
+    }
+  };
+  reader.readAsText(file);
+});
+
+function loadId() {
+  const raw = document.getElementById('load-raw').value.trim();
+  if (!raw) { showErr('load-err','Pega tu ID o sube el archivo primero.'); return; }
+  const v = detectVersion(raw);
+
+  if (mode === 'migrate' && v !== 'v0' && v !== 'v1') {
+    if (v === 'v2') showErr('load-err', 'Este ID ya está en el nuevo formato v2. Usa "Editar" si quieres modificarlo.');
+    else showErr('load-err', 'No se reconoce el formato de este ID.');
+    return;
+  }
+
+  sourceId = raw;
+  if (!sourceUrl) sourceUrl = '';
+  showErr('load-err','');
+
+  if (mode === 'analyze') {
+    analyzingId = raw;
+    renderAnalysis(raw);
+    goTo('s-analyze');
+    return;
+  }
+
+  prepareForm();
+  goTo('s-form');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// FORMULARIO
+// ═══════════════════════════════════════════════════════════════════
+function prepareForm() {
+  const v = sourceId ? detectVersion(sourceId) : 'none';
+
+  // Título
+  const titles = { migrate:'🔄 Migrar al formato v2', edit:'✏️ Editar ID', new:'✨ Crear cuenta nueva' };
+  document.getElementById('form-title').textContent = titles[mode] || '';
+
+  // Botón volver
+  document.getElementById('form-back-btn').onclick = () => goTo(mode==='new' ? 's-mode' : 's-load');
+
+  // ID detectado
+  const detEl = document.getElementById('form-detected');
+  if (sourceId) {
+    detEl.classList.remove('hidden');
+    document.getElementById('form-detected-id').textContent = sourceId;
+    document.getElementById('form-detected-badge').textContent = versionLabel(v);
+    document.getElementById('form-detected-badge').className  = 'badge ' + versionBadgeClass(v);
+    const jd = dateFromId(sourceId);
+    const pub = pubId(sourceId);
+    document.getElementById('form-detected-meta').textContent =
+      `ID público: ${pub}` + (jd ? `  ·  Desde: ${fmtDate(jd)}` : '');
+  } else {
+    detEl.classList.add('hidden');
+  }
+
+  // Aviso cambio de ID público
+  document.getElementById('form-warn-pubchange').classList.toggle('hidden', mode !== 'migrate');
+
+  // Prellenar campos
+  if (v === 'v2') {
+    const parts = sourceId.split('~');
+    document.getElementById('f-user').value = parts[0];
+    document.getElementById('f-disp').value = decName(parts[1]);
+    document.getElementById('f-rand').value = parts[3];
+    const jd = dateFromV2(sourceId);
+    document.getElementById('f-date').value = jd ? fmtDateISO(jd) : '';
+  } else if (v === 'v1' || v === 'v0') {
+    // Migración: solo prellenar fecha si la hay
+    document.getElementById('f-user').value = '';
+    document.getElementById('f-disp').value = '';
+    document.getElementById('f-rand').value = '';
+    const jd = dateFromId(sourceId);
+    document.getElementById('f-date').value = jd ? fmtDateISO(jd) : '';
+  } else {
+    // Nuevo
+    document.getElementById('f-user').value = '';
+    document.getElementById('f-disp').value = '';
+    document.getElementById('f-rand').value = '';
+    document.getElementById('f-date').value = '';
+  }
+
+  document.getElementById('f-url').value = sourceUrl || '';
+  showErr('form-err','');
+  updatePreview();
+}
+
+// Vista previa en tiempo real
+function updatePreview() {
+  const user = document.getElementById('f-user').value.trim().toLowerCase();
+  const rand = document.getElementById('f-rand').value.trim() || '????????';
+  const pub  = user ? `${user}#${rand.slice(0,4)}` : '—';
+  document.getElementById('preview-pub').textContent = pub;
+}
+document.getElementById('f-user').addEventListener('input', updatePreview);
+document.getElementById('f-rand').addEventListener('input', updatePreview);
+
+// Desbloqueos de longitud
+document.getElementById('f-user-unlock').addEventListener('change', e => {
+  document.getElementById('f-user').maxLength = e.target.checked ? 999 : 12;
+});
+document.getElementById('f-disp-unlock').addEventListener('change', e => {
+  document.getElementById('f-disp').maxLength = e.target.checked ? 999 : 20;
+});
+
+function regenRand() {
+  document.getElementById('f-rand').value = rnd36(8);
+  updatePreview();
+}
+
+function clearForm() {
+  ['f-user','f-disp','f-rand','f-url'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-date').value = '';
+  showErr('form-err','');
+  updatePreview();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CONSTRUIR ID
+// ═══════════════════════════════════════════════════════════════════
+function buildId() {
+  const user    = document.getElementById('f-user').value.trim();
+  const disp    = document.getElementById('f-disp').value.trim();
+  const dateStr = document.getElementById('f-date').value;
+  const randRaw = document.getElementById('f-rand').value.trim();
+  const url     = document.getElementById('f-url').value.trim();
+  const unlockUser = document.getElementById('f-user-unlock').checked;
+  const unlockDisp = document.getElementById('f-disp-unlock').checked;
+
+  // Validación
+  const userMin = 3, userMax = unlockUser ? 999 : 12;
+  const dispMax = unlockDisp ? 999 : 20;
+  const userRx  = /^[A-Za-z0-9_]+$/;
+
+  if (!user) { showErr('form-err','El nombre de usuario no puede estar vacío.'); return; }
+  if (user.length < userMin || user.length > userMax) {
+    showErr('form-err',`El nombre de usuario debe tener entre ${userMin} y ${userMax} caracteres.`); return;
+  }
+  if (!userRx.test(user)) { showErr('form-err','El nombre de usuario solo puede tener letras, números y guion bajo.'); return; }
+  if (!disp) { showErr('form-err','El nombre de display no puede estar vacío.'); return; }
+  if (disp.length > dispMax) { showErr('form-err',`El nombre de display es demasiado largo (máx. ${dispMax}).`); return; }
+  showErr('form-err','');
+
+  const date = dateStr ? parseInputDate(dateStr) : null;
+  const rand = randRaw && /^[0-9a-zA-Z]+$/.test(randRaw) ? randRaw.toLowerCase().slice(0,8) : rnd36(8);
+
+  builtId = makeId(user, disp, date, rand);
+
+  // Rellenar resultado
+  const jd = dateFromV2(builtId);
+  document.getElementById('res-pub').textContent  = pubId(builtId);
+  document.getElementById('res-disp').textContent = decName(builtId.split('~')[1]);
+  document.getElementById('res-date').textContent = fmtDate(jd);
+  document.getElementById('res-priv').textContent = builtId;
+  document.getElementById('res-url').value = url || sourceUrl || '';
+
+  const labels = { migrate:'ID antiguo migrado al formato v2', edit:'ID actualizado · campos editados', new:'Cuenta nueva creada hoy' };
+  document.getElementById('res-label').textContent = labels[mode] || '';
+
+  // Desglose
+  renderBreakdownTable('res-table', builtId, url || sourceUrl || '');
+
+  goTo('s-result');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ANÁLISIS
+// ═══════════════════════════════════════════════════════════════════
+function renderAnalysis(id) {
+  const v    = detectVersion(id);
+  const jd   = dateFromId(id);
+  const pub  = pubId(id);
+
+  document.getElementById('an-badge').textContent  = versionLabel(v);
+  document.getElementById('an-badge').className    = 'badge ' + versionBadgeClass(v);
+
+  let html = '';
+
+  // Resumen
+  html += `<div class="field"><h3>ID público</h3><div class="copy-row"><div class="mono-val large">${esc(pub)}</div><button class="copy-btn" onclick="copyText('${esc(pub)}',this)">📋</button></div></div>`;
+
+  if (v === 'v2') {
+    const parts = id.split('~');
+    const disp  = decName(parts[1]);
+    html += `<div class="field"><h3>Nombre de display</h3><div class="mono-val" style="color:var(--text);font-family:inherit">${esc(disp)}</div></div>`;
+    html += `<div class="field"><h3>Nombre de usuario</h3><div class="mono-val">${esc(parts[0])}</div></div>`;
+    html += `<div class="field"><h3>Fecha de alta</h3><div class="mono-val" style="color:var(--muted)">${fmtDate(jd)}</div></div>`;
+    html += `<div class="field"><h3>Parte aleatoria (completa)</h3><div class="mono-val">${esc(parts[3])}</div></div>`;
+  } else if (v === 'v1') {
+    html += `<div class="field"><h3>Fecha de alta aprox.</h3><div class="mono-val" style="color:var(--muted)">${fmtDate(jd)}</div></div>`;
+    html += `<div class="alert alert-warn"><strong>Formato v1</strong>No contiene nombre de usuario ni de display. Usa "Editar este ID" para migrarlo.</div>`;
+  } else if (v === 'v0') {
+    html += `<div class="alert alert-warn"><strong>Formato v0 (UUID clásico)</strong>Sin fecha ni nombres codificados. Usa "Editar este ID" para migrarlo.</div>`;
+  }
+
+  html += `<details class="mb2"><summary class="card-inner" style="padding:.65rem 1rem;font-size:.75rem;color:var(--dim)">🔒 Ver ID privado completo</summary><div class="card-inner" style="margin-top:.25rem"><div class="copy-row"><div class="mono-val dim">${esc(id)}</div><button class="copy-btn" onclick="copyText('${id.replace(/'/g,"\\'")}',this)">📋</button></div></div></details>`;
+
+  document.getElementById('an-content').innerHTML = html;
+
+  // Tabla de desglose
+  renderBreakdownTable('an-table', id, '');
+}
+
+function editFromAnalysis() {
+  sourceId  = analyzingId;
+  sourceUrl = '';
+  mode      = 'edit';
+  prepareForm();
+  goTo('s-form');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TABLA DE DESGLOSE
+// ═══════════════════════════════════════════════════════════════════
+function renderBreakdownTable(tableId, id, url) {
+  const v    = detectVersion(id);
+  const jd   = dateFromId(id);
+  const pub  = pubId(id);
+  let rows   = [];
+
+  if (v === 'v2') {
+    const parts = id.split('~');
+    const disp  = decName(parts[1]);
+    rows = [
+      ['ID Privado',        id,                   false],
+      ['ID Público',        pub,                  false],
+      ['Usuario',           parts[0],             false],
+      ['Nombre Display',    disp,                 true ],
+      ['Fecha Alta',        jd ? fmtDateISO(jd) : '—', true],
+      ['Fecha Alta (texto)',jd ? fmtDate(jd) : '—',     true],
+      ['Parte Aleatoria',   parts[3],             false],
+      ['Parte Aleatoria (sufijo públic)', parts[3].slice(0,4), false],
+      ['Nombre codificado', parts[1],             false],
+      ['Fecha codificada',  parts[2],             false],
+      ['Versión',           'v2',                 true ],
+      ['URL Juego',         url || '—',           true ],
+    ];
+  } else if (v === 'v1') {
+    const parts = id.split('-');
+    rows = [
+      ['ID Privado',   id,               false],
+      ['ID Público',   pub,              false],
+      ['UUID Base',    parts.slice(0,5).join('-'), false],
+      ['Timestamp enc',parts[5],         false],
+      ['Fecha Alta',   jd ? fmtDateISO(jd) : '—', true],
+      ['Versión',      'v1',             true],
+    ];
+  } else if (v === 'v0') {
+    rows = [
+      ['ID Privado',   id,    false],
+      ['ID Público',   pub,   false],
+      ['Versión',      'v0',  true ],
+    ];
+  } else {
+    rows = [['ID (desconocido)', id, false]];
+  }
+
+  const tbody = rows.map(([k, val, norm]) =>
+    `<tr><td class="k">${esc(k)}</td><td class="v ${norm?'norm':''}">${esc(String(val))}</td></tr>`
+  ).join('');
+  document.getElementById(tableId).innerHTML =
+    `<thead><tr><th>Campo</th><th>Valor</th></tr></thead><tbody>${tbody}</tbody>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DESCARGA
+// ═══════════════════════════════════════════════════════════════════
+function detectUrlFromForm() {
+  document.getElementById('res-url').value = sourceUrl || '';
+}
+
+function doDownload() {
+  if (!builtId) return;
+  const pub   = pubId(builtId);
+  const disp  = decName(builtId.split('~')[1]);
+  const jd    = dateFromV2(builtId);
+  const jstr  = fmtDate(jd);
+  const url   = document.getElementById('res-url').value.trim() || './index.html';
+  const enc   = encodeURIComponent(builtId);
+
+  const html = `<!DOCTYPE html><html><head><title>Mi ID - La Intersección</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+body{background:#111827;color:#f3f4f6;font-family:sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;margin:0;text-align:center;padding:1rem}
+.card{background:#1f2937;padding:2rem;border-radius:1rem;border:1px solid #374151;max-width:420px;width:100%}
+.label{font-size:.7rem;color:#6b7280;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.25rem;text-align:left}
+.code{background:#111;padding:.75rem 1rem;margin:.4rem 0 1rem;font-family:monospace;font-size:1.05rem;border:1px solid #4f46e5;color:#818cf8;word-break:break-all;border-radius:.5rem;text-align:left}
+.code.small{font-size:.7rem;color:#4b5563;border-color:#374151}
+.join{font-size:.75rem;color:#6b7280;margin-bottom:1.25rem}
+.note{font-size:.8rem;color:#9ca3af;margin:1rem 0;line-height:1.5}
+a.btn{background:#4f46e5;color:white;padding:.75rem 1.5rem;text-decoration:none;border-radius:.5rem;font-weight:bold;display:inline-block}
+a.btn:hover{background:#4338ca}
+</style>
+</head><body><div class="card">
+<h1 style="margin-top:0">Tu Llave de Acceso</h1>
+<div class="label">Nombre de display</div><div class="code">${esc(disp)}</div>
+<div class="label">ID público (podio)</div><div class="code">${esc(pub)}</div>
+<div class="join">Miembro desde ${jstr}</div>
+<div class="label">ID privado completo (no compartir)</div><div class="code small">${esc(builtId)}</div>
+<div class="note">Tu acceso está integrado en este archivo.<br>Guárdalo en un lugar seguro.</div>
+<a href="${url}?restore_id=${enc}" class="btn">Entrar al Juego</a>
+</div>
+<script>
+const targetUrl = "${url}?restore_id=${enc}";
+setTimeout(()=>{ window.location.href = targetUrl; }, 1200);
+<\/script>
+</body></html>`;
+
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([html],{type:'text/html'}));
+  const safeUser = builtId.split('~')[0] || 'usuario';
+  a.download = `id_${safeUser}_interseccion.html`;
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CLIPBOARD
+// ═══════════════════════════════════════════════════════════════════
+function copyText(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    if (!btn) return;
+    const orig = btn.textContent;
+    btn.textContent = '✔'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+  });
+}
+function copyField(fieldId, btn) {
+  const el = document.getElementById(fieldId);
+  copyText(el.textContent || el.value, btn);
+}
+function copyTSV(tableId, withHeaders) {
+  const table = document.getElementById(tableId);
+  const rows  = Array.from(table.querySelectorAll('tbody tr'));
+  let tsv = '';
+  if (withHeaders) {
+    const headers = Array.from(table.querySelectorAll('th')).map(th=>th.textContent);
+    tsv += headers.join('\t') + '\n';
+  }
+  tsv += rows.map(tr =>
+    Array.from(tr.querySelectorAll('td')).map(td=>td.textContent).join('\t')
+  ).join('\n');
+  navigator.clipboard.writeText(tsv).then(() => {
+    showToast('¡Copiado al portapapeles!');
+  });
+}
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_toast';
+    t.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;background:#059669;color:#fff;padding:.6rem 1.2rem;border-radius:.5rem;font-size:.85rem;font-weight:600;z-index:999;transition:opacity .3s';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._to);
+  t._to = setTimeout(() => { t.style.opacity = '0'; }, 2000);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ESCAPE HTML
+// ═══════════════════════════════════════════════════════════════════
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
