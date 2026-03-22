@@ -331,7 +331,7 @@ details > summary::-webkit-details-marker { display: none; }
       <!-- URL de redirección -->
       <div class="field">
         <label>URL de redirección <span>(enlace al juego)</span></label>
-        <input type="text" id="f-url" placeholder="https://tu-sitio.com/index.html">
+        <input type="text" id="f-url" placeholder="https://releos.github.io/interseccion">
         <p class="hint">La URL que incluirá el archivo de ID descargable.</p>
       </div>
 
@@ -442,7 +442,7 @@ details > summary::-webkit-details-marker { display: none; }
       <div class="field">
         <h3>URL de redirección en el archivo</h3>
         <div class="input-with-btn">
-          <input type="text" id="res-url" placeholder="https://tu-sitio.com/index.html">
+          <input type="text" id="res-url" placeholder="https://releos.github.io/interseccion">
           <button class="btn btn-ghost btn-sm" onclick="detectUrlFromForm()">↩ Restaurar</button>
         </div>
         <p class="hint">Puedes cambiarla antes de descargar.</p>
@@ -922,7 +922,7 @@ function doDownload() {
   const disp  = decName(builtId.split('~')[1]);
   const jd    = dateFromV2(builtId);
   const jstr  = fmtDate(jd);
-  const url   = document.getElementById('res-url').value.trim() || './index.html';
+  const url   = document.getElementById('res-url').value.trim() || 'https://releos.github.io/interseccion';
   const enc   = encodeURIComponent(builtId);
 
   const html = `<!DOCTYPE html><html><head><title>Mi ID - La Intersección</title>
